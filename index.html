@@ -33,6 +33,13 @@ if (QueryArgs.getBool('usePolyfill', true)) {
 
 const base = "https://immersive-web.github.io/webxr-samples/";
 
+const debug = location.href.indexOf("github") == -1;
+
+const URL_SPACE = base + 'media/gltf/space/space.gltf';
+const URL_MILKY_WAY = base + 'media/textures/milky-way-4k.png';
+const URL_SUNDOME = "https://digitaltwin-echizen.github.io/vr-sundome/sundome.glb";
+const URL_SUNFLOWER = debug ? "./sunflower.gltf" : base + 'media/gltf/sunflower/sunflower.gltf';
+
 // XR globals.
 let xrButton = null;
 let xrImmersiveRefSpace = null;
@@ -46,20 +53,18 @@ let xrSessionString = 'immersive-vr';
 let gl = null;
 let renderer = null;
 const scene = new Scene();
-const solarSystem = new Gltf2Node({ url: base + 'media/gltf/space/space.gltf' });
-//const solarSystem = new Gltf2Node({ url: "./sunflower.gltf" });
-//const solarSystem = new Gltf2Node({ url: "https://immersive-web.github.io/webxr-samples/media/gltf/sunflower/sunflower.gltf" });
+const solarSystem = new Gltf2Node({ url: URL_SPACE });
 
 // The solar system is big (citation needed). Scale it down so that users
 // can move around the planets more easily.
 solarSystem.scale = [0.1, 0.1, 0.1];
 scene.addNode(solarSystem);
 // Still adding a skybox, but only for the benefit of the inline view.
-const skybox = new SkyboxNode({ url: base + 'media/textures/milky-way-4k.png' });
+const skybox = new SkyboxNode({ url: URL_MILKY_WAY });
 //scene.addNode(skybox);
 
 // sundome
-const sundome = new Gltf2Node({ url: "https://digitaltwin-echizen.github.io/vr-sundome/sundome.glb" });
+const sundome = new Gltf2Node({ url: URL_SUNDOME });
 sundome.scale = [0.002, 0.002, 0.002];
 sundome.translation = [0, -.6, -.1];
 sundome.colorManagement = true; // <a-scene id="scene" background="color: #4080e0" renderer="colorManagement: true">
@@ -183,8 +188,7 @@ function addAnchoredObjectToScene(anchor) {
 
   anchor.context = {};
 
-  const flower= new Gltf2Node({ url: "./sunflower.gltf" });
-  //const flower = new Gltf2Node({ url: base + 'media/gltf/sunflower/sunflower.gltf' });
+  const flower = new Gltf2Node({ url: URL_SUNFLOWER });
   scene.addNode(flower);
   anchor.context.sceneObject = flower;
   flower.anchor = anchor;
