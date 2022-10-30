@@ -22,14 +22,12 @@ import { InlineViewerHelper } from 'https://immersive-web.github.io/webxr-sample
 import { Gltf2Node } from 'https://immersive-web.github.io/webxr-samples/js/render/nodes/gltf2.js';
 import { QueryArgs } from 'https://immersive-web.github.io/webxr-samples/js/util/query-args.js';
 
-/*
 // If requested, use the polyfill to provide support for mobile devices
 // and devices which only support WebVR.
 import WebXRPolyfill from 'https://immersive-web.github.io/webxr-samples/js/third-party/webxr-polyfill/build/webxr-polyfill.module.js';
 if (QueryArgs.getBool('usePolyfill', true)) {
-  let polyfill = new WebXRPolyfill();
+  new WebXRPolyfill();
 }
-*/
 
 const base = "https://immersive-web.github.io/webxr-samples/";
 
@@ -205,9 +203,9 @@ function addAnchoredObjectToScene(anchor) {
 }
 
 function onSelect(event) {
-  let frame = event.frame;
-  let session = frame.session;
-  let anchorPose = new XRRigidTransform();
+  const frame = event.frame;
+  const session = frame.session;
+  const anchorPose = new XRRigidTransform();
   let inputSource = event.inputSource;
 
   // If the user is on a screen based device, place the anchor 1 meter in front of them.
@@ -276,6 +274,7 @@ function onXRFrame(t, frame) {
 
 // Start the XR application.
 initXR();
+
 </script>
 </body>
 </html>
