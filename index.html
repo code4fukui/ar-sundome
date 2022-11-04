@@ -23,6 +23,14 @@ import { SkyboxNode } from 'https://immersive-web.github.io/webxr-samples/js/ren
 import { InlineViewerHelper } from 'https://immersive-web.github.io/webxr-samples/js/util/inline-viewer-helper.js';
 import { Gltf2Node } from 'https://immersive-web.github.io/webxr-samples/js/render/nodes/gltf2.js';
 import { QueryArgs } from 'https://immersive-web.github.io/webxr-samples/js/util/query-args.js';
+import { createCube } from "./createCube.js";
+
+/*
+const size = 0.1;
+const snap = n => Math.floor(n / size) * size + size / 2;
+const snap3D = p => ({ x: snap(p.x), y: snap(p.y), z: snap(p.z) });
+//const snap3D = p => p.map(p => snap(p));
+*/
 
 // If requested, use the polyfill to provide support for mobile devices
 // and devices which only support WebVR.
@@ -71,7 +79,7 @@ sundome.colorManagement = true; // <a-scene id="scene" background="color: #4080e
 scene.colorManagement = true; // <a-scene id="scene" background="color: #4080e0" renderer="colorManagement: true">
 scene.addNode(sundome);
 
-const MAX_ANCHORED_OBJECTS = 300;
+const MAX_ANCHORED_OBJECTS = 1000;
 let anchoredObjects = [];
 
 // Set with all anchors tracked in a previous frame.
@@ -127,10 +135,10 @@ function initGL() {
   });
   document.body.appendChild(gl.canvas);
 
-  function onResize() {
+  const onResize = () => {
     gl.canvas.width = gl.canvas.clientWidth * window.devicePixelRatio;
     gl.canvas.height = gl.canvas.clientHeight * window.devicePixelRatio;
-  }
+  };
   window.addEventListener('resize', onResize);
   onResize();
 
@@ -167,6 +175,10 @@ function onSessionStarted(session) {
     }
     session.requestAnimationFrame(onXRFrame);
   });
+
+  // test
+  const node = createCube(renderer, [0, 0, -.5], 0.1);
+  scene.addNode(node);
 }
 
 function onEndSession(session) {
@@ -186,11 +198,12 @@ function addAnchoredObjectToScene(anchor) {
 
   anchor.context = {};
 
-  const flower = new Gltf2Node({ url: URL_SUNFLOWER });
-  scene.addNode(flower);
-  anchor.context.sceneObject = flower;
-  flower.anchor = anchor;
-  anchoredObjects.push(flower);
+  //const node / new Gltf2Node({ url: URL_SUNFLOWER });
+  const node = createCube(renderer, [0, 0, -0.02], 0.1);
+  scene.addNode(node);
+  anchor.context.sceneObject = node;
+  node.anchor = anchor;
+  anchoredObjects.push(node);
 
   // For performance reasons if we add too many objects start
   // removing the oldest ones to keep the scene complexity
@@ -202,11 +215,11 @@ function addAnchoredObjectToScene(anchor) {
   }
 }
 
-function onSelect(event) {
+async function onSelect(event) {
   const frame = event.frame;
   const session = frame.session;
-  const anchorPose = new XRRigidTransform();
-  let inputSource = event.inputSource;
+  let anchorPose = new XRRigidTransform();
+  const inputSource = event.inputSource;
 
   // If the user is on a screen based device, place the anchor 1 meter in front of them.
   // Otherwise place the anchor at the location of the input device
@@ -218,12 +231,15 @@ function onSelect(event) {
   }
 
   if (session.isImmersive) {
-    // Create a free-floating anchor.
-    frame.createAnchor(anchorPose, inputSource.targetRaySpace).then((anchor) => {
+    try {
+      // Create a free-floating anchor.
+      const rayspace = inputSource.targetRaySpace;
+      //const p2 = snap3D(p);
+      const anchor = await frame.createAnchor(anchorPose, rayspace);
       addAnchoredObjectToScene(anchor);
-    }, (error) => {
+    } catch (error) {
       console.error("Could not create anchor: " + error);
-    });
+    }
   }
 }
 
